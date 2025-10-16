@@ -4,34 +4,39 @@ server:
 spring:
   application:
     name: api-gateway
+
   cloud:
     gateway:
-      discovery:
-        locator:
-          enabled: true
-          lower-case-service-id: true
-      routes:
-        - id: product-service
-          uri: lb://product-service
-          predicates:
-            - Path=/api/product/**
-        - id: order-service
-          uri: lb://order-service
-          predicates:
-            - Path=/api/order/**
-        - id: inventory-service
-          uri: lb://inventory-service
-          predicates:
-            - Path=/api/inventory/**
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: true
+              lower-case-service-id: true
+          routes:
+            - id: product-service
+              uri: lb://product-service
+              predicates:
+                - Path=/api/product/**
+            - id: order-service
+              uri: lb://order-service
+              predicates:
+                - Path=/api/order/**
+            - id: inventory-service
+              uri: lb://inventory-service
+              predicates:
+                - Path=/api/inventory/**
 
   zipkin:
     base-url: http://localhost:9411
-    sender-type: web
+    sender:
+      type: web
 
 management:
   endpoints:
     web:
-      exposure: "*"
+      exposure:
+        include: ["*"]      # Must be a list, not a string
   tracing:
     sampling:
       probability: 1.0
