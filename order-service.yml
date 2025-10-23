@@ -4,13 +4,11 @@ server:
 spring:
   application:
     name: order-service
-
   datasource:
     url: jdbc:mysql://host.docker.internal:3306/orderdb?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: root
     password: mysql
     driver-class-name: com.mysql.cj.jdbc.Driver
-
   jpa:
     hibernate:
       ddl-auto: update
@@ -18,7 +16,6 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
-
   kafka:
     bootstrap-servers: kafka:9092
     producer:
@@ -30,6 +27,11 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "com.example.orderservice.dto,com.example.inventoryservice.events,*"
+  zipkin:
+    base-url: http://zipkin:9411/
+  sleuth:
+    sampler:
+      probability: 1.0
 
 eureka:
   client:
@@ -46,10 +48,6 @@ management:
       exposure:
         include: ["*", "prometheus"]
 
-  tracing:
-    sampling:
-      probability: 1.0
-
 resilience4j:
   circuitbreaker:
     instances:
@@ -60,9 +58,3 @@ resilience4j:
         failureRateThreshold: 50
         waitDurationInOpenState: 5s
         permittedNumberOfCallsInHalfOpenState: 3
-
-spring:
-  zipkin:
-    base-url: http://zipkin:9411/
-    sender:
-      type: web
