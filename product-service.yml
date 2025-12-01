@@ -4,11 +4,13 @@ server:
 spring:
   application:
     name: product-service
+
   datasource:
     url: jdbc:mysql://localhost:3306/productdb?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: root
     password: mysql
     driver-class-name: com.mysql.cj.jdbc.Driver
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -16,6 +18,13 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/microservices-realm
+          jwk-set-uri: http://localhost:8080/realms/microservices-realm/protocol/openid-connect/certs
 
 eureka:
   client:
@@ -26,7 +35,9 @@ management:
   endpoints:
     web:
       exposure:
-        include: ["*", "prometheus"]
+        include:
+          - "*"
+          - "prometheus"
   tracing:
     sampling:
       probability: 1.0
@@ -41,5 +52,3 @@ resilience4j:
         failureRateThreshold: 50
         waitDurationInOpenState: 5s
         permittedNumberOfCallsInHalfOpenState: 3
-
-# Prometheus dependency will handle /actuator/prometheus
