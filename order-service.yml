@@ -6,7 +6,7 @@ spring:
     name: order-service
 
   datasource:
-    url: jdbc:mysql://localhost:3306/orderdb?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    url: jdbc:mysql://mysql-order:3306/orderdb?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -14,43 +14,60 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+
     show-sql: true
+
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
 
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: kafka:9093
+
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
     consumer:
       group-id: order-group
+
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+
       auto-offset-reset: earliest
+
       properties:
         spring.json.trusted.packages: "*"
-        spring.json.value.default.type: com.example.orderservice.dto.OrderStatusEvent
 
-  zipkin:
-    base-url: http://localhost:9411/
+        spring.json.value.default.type: com.example.orderservice.dto.OrderStatusEvent
 
 eureka:
   client:
+    register-with-eureka: true
+    fetch-registry: true
+
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://eureka-server:8761/eureka
+
   instance:
     prefer-ip-address: true
+
     lease-expiration-duration-in-seconds: 10
+
     lease-renewal-interval-in-seconds: 5
+
+zipkin:
+  base-url: http://zipkin:9411
 
 management:
   endpoints:
     web:
       exposure:
-        include: ["*", "prometheus"]
+        include:
+          - "*"
+          - prometheus
+
   tracing:
     sampling:
       probability: 1.0
@@ -58,6 +75,7 @@ management:
 resilience4j:
   circuitbreaker:
     instances:
+
       inventoryServiceCircuitBreaker:
         registerHealthIndicator: true
         slidingWindowSize: 5
@@ -69,6 +87,8 @@ resilience4j:
 springdoc:
   api-docs:
     path: /api-docs
+
   swagger-ui:
     path: /swagger-ui.html
+
     operationsSorter: method
